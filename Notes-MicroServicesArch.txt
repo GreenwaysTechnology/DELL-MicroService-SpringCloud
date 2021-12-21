@@ -1,0 +1,952 @@
+Softwares:
+
+1.jdk 11
+2.maven
+3.IDE - intellij idea community edition
+4.docker
+..............................................................................................
+Spring Boot 
+
+.............................................................................................
+					MicroServices
+.............................................................................................
+
+Software Development Models:
+
+Domain:
+  Banking
+
+Distributed Application Architecture:
+
+Distributed means broken into multiple layers and making them to communicate.
+
+Application has 3 major layers
+
+1.User Interface -  where we present data - Browser,Mobile Apps,Device Apps
+
+2.Biz layer -  where we can process ,accumulate the data.
+
+3.Data Layer - Data Source - RDBMS,NOSQL,FileSystem,External Systems like webservices,Devices
+
+
+Types of Application arch:
+
+1.Mainframe based arch
+  Biz layer and data layer would be the same machine - server 
+  UI layer would be in thin clients
+
+2.Micro computer based arch : client server : Network - LAN and WAN 
+  2.1. - Single tier arch.
+   Biz logic + data layer + ui layer everything in the same machine
+  2.2 - two tier arch
+   Biz logic + data layer - server
+  ui layer in another machine -  client
+
+1989 :  Web and Internet : Web based /Internet based Client Server Arch
+
+1995 after :
+
+2.2 - two tier arch
+   Biz logic + data layer - Web Server / Web Containers
+  ui layer in another machine -  client - webbrowsers- GUI
+
+
+2.3 - There tier arch
+   Biz logic - Web Server / Web Containers
+       |
+   Data storage - Database servers
+  ui layer in another machine -  client - webbrowsers- GUI
+
+2.4 - N-tier arch
+   Biz logic - Web Server / Web Containers  / Application containers
+      |              |
+   Web Layer   | Biz layer           | Data Layer
+     |
+  To Get            |
+  HTTP request     Services --------- | DAO -----| databases/ Messaging services
+  and Process
+      
+       |
+   Data storage - Database servers
+  ui layer in another machine -  client - webbrowsers- GUI
+
+Java and Distributed Application Development.
+
+
+Java is technology created for devices but was tested in networks in order to understand how java achives platform portablity.
+
+Java was created to work on networks.
+
+Java was very suitable for building distributed internet network based and web based Applications.
+
+Java published 3 major editions -  J2SE(JSE),J2EE(JEE),J2ME(JME)
+
+JSE : CORE language features, oo, error handling, databased connectivy.
+JEE : Developed for building enterprise distribtued n tier client server web based application.
+
+All java tech based on Specifications ;  any body can implementations.
+
+JEE implementations :
+
+ Servlet,JSP  -> Web layer  + ui layer
+ EJB,JPA,Hibernate -> Data Layer
+ JMS ->integration layer
+ JConnector - integration layer
+
+The above traditional development model is called "Monolithic" Development.
+
+
+Distributed Enterprise Application Development Model : Java /JEE.
+
+Web App Types
+
+0.Static Web Apps 
+   1989 to 1995 -  Where HTML Pages were hard coded , sent to clients
+
+1.Dynamic Content Generation Technology
+  1995 to till date
+  -CGI - Perl/C++
+  -J2EE  - Servlets and JSP
+  -ASP  - Microsoft
+  -PHP  - Open source
+
+ Drawbacks of the DCG Technology
+ - It can render only html pages(documents
+
+2000 : ECommerce : Biz to Biz integration via web and Internet.
+
+WebServices:
+   It is program , which can transfer data inform of the document.
+
+Data Interchange Format:
+   XML - was taken as univeral data interchange format.
+
+ How to exchange xml documents among systems
+
+Web Services with XML:
+   Built SOAP protocal as tranport for sending and receiving XML docments over internet via http : SOAP Web Service.
+  SOA - built based on SOAP Webservices
+
+XML based web had lot of limititations: After introduction Mobile Computing:
+.............................................................................
+
+REST Full WebServices ;
+  very light , json based , any type format can be exchanged over internet.
+..............................................................................................
+				 JEE and RestFull webservices :Monoloithic
+
+
+Traditional development , deployment,maitaince
+
+1.Select DOMAIN : Food Order Management application
+
+-Modules
+ OrderManagement
+   -Controller - api
+   -Service
+   -Repository
+  |
+ Data Source(sql/nosql)
+
+ DeliveryManagement
+  -Controller - api
+   -Service
+   -Repository
+  |
+ Data Source(sql/nosql)
+   -Controller - api
+   -Service
+   -Repository
+  |
+ Data Source(sql/nosql)
+  -Controller - api
+   -Service
+   -Repository
+  |
+ Data Source(sql/nosql)
+ -Controller - api
+   -Service
+   -Repository
+  |
+ Data Source(sql/nosql)
+ RestaurantManagement
+ -Controller - api
+   -Service
+   -Repository
+  |
+ Data Source(sql/nosql)
+ Payments
+-Controller - api
+   -Service
+   -Repository
+  |
+ Data Source(sql/nosql)
+ Billing and Invoices
+-Controller - api
+   -Service
+   -Repository
+  |
+ Data Source(sql/nosql)
+ Notifications
+-Controller - api
+   -Service
+   -Repository
+  |
+ Data Source(sql/nosql)
+
+
+Deployment:
+
+ The entire application is packed into "single war/jar/ear" and deployed on container - TOMCAT/Weblogic/webSphere.....
+
+Depsite the application is modular , but we have to bundle the appinto single distribution.
+
+Advantages of the above model(monolithic)
+
+1.simple to develop
+
+2.Easy to changes
+
+3.Testing is easy because only single app
+
+4.Easy to scale
+
+
+Once the app starts growing, 
+
+You have to modify the code, compile,build and deploy
+..............................................................................................
+				MicroService Architecture
+
+
+Breaking the application into smaller application.
+
+Develop,test,Build, Deploy Separatly
+  The module can be developed as a app by a team of people.
+
+Features:
+
+1. Separate team of people
+2. Separate tech stack - java,.net,javascript.
+3. Each app has its own database
+..............................................................................................
+
+Advantages of MicroServices:
+
+1.It enables the CI && CD for large applications :Automations
+2.Services are smaller , easy to maintain.
+3.Services are independently deployable -  containers
+4.Services are highly scalable - increasing and decreasing app instance instances inside containers.
+5.It allows to extends new technologies - no vendor lock
+6.It allows better falut management - error management
+..............................................................................................
+				How to start Microservices architecture
+..............................................................................................
+
+Micro Service Architecture pattern language.
+
+Pattern:
+  A pattern is a reusable solution to a problem that occurs in a particular contex.
+
+
+Patterns can be divied into three layers:
+
+1.infrastructure pattern:
+     These patterns solve problems that are mostly infrastructure issues outside development.
+2.Application infrastructure:
+      These patterns solve problem of distrubuted configuration,security
+3.Application Patterns
+    Purly used by developers in side code
+  
+  -Communication Style -  HTTP,tcp,protobuff...
+  -Discovery
+  -Database and transactions
+  -Data formats
+  -How to handle errors ; Realiblity
+..............................................................................................
+Patterns Overview:
+
+1.Decomposition
+
+Decompose by business capability
+Decompose by subdomain
+Self-contained Service
+Service per team.
+
+...........................................................................................
+
+Functional Requirement: User story:
+
+The Place Order story. We can expand that story into numerous user scenarios including
+this one:
+Given a consumer
+And a restaurant
+And a delivery address/time that can be served by that restaurant
+And an order total that meets the restaurant's order minimum
+When the consumer places an order for the restaurant
+Then consumer's credit card is authorized
+And an order is created in the PENDING_ACCEPTANCE state
+And the order is associated with the consumer
+And the order is associated with the restaurant
+
+Java : class design
+ The nouns in the user story will become classes
+Consumer,Order,Restaurant,CreditCard
+
+
+Accept Order user story:
+
+Given an order that is in the PENDING_ACCEPTANCE state
+and a courier that is available to deliver the order
+When a restaurant accepts an order with a promise to prepare by a particular
+time
+Then the state of the order is changed to ACCEPTED
+And the order's promiseByTime is updated to the promised time
+And the courier is assigned to deliver the order
+
+
+What class 
+
+ Consumer—A consumer who places orders.
+ Order—An order placed by a consumer. It describes the order and tracks its status.
+ OrderLineItem—A line item of an Order.
+ DeliveryInfo—The time and place to deliver an order.
+ Restaurant—A restaurant that prepares orders for delivery to consumers.
+ MenuItem—An item on the restaurant’s menu.
+ Courier—A courier who deliver orders to consumers. It tracks the availability of
+the courier and their current location.
+ Address—The address of a Consumer or a Restaurant.
+ Location—The latitude and longitude of a Courier.
+
+............................................................................................
+					Systems operations
+
+
+Once we have defined domain model, the next step is to identify the requests that application must handle and response it produces.
+
+How to define system operations?
+
+ System operations are defined by an "API".
+
+API : Application Program interface
+ 
+  It is method/function called , executed, returns some data.
+
+How to communicate api?
+
+  via Protocals - can be http,tcp,domain specific
+
+How to represent api?
+
+API :
+   - Web Service
+	=>REST FULL  /SOAP - Soap is not recommended - HTTP.
+        =>GraphQL
+    -RPC
+       =>Grpc is implementation  from the google.
+    
+    -Messaging
+        =>Messaging Middlewares - rabbitmq,kaffka ,ActiveMQ......
+
+  
+There are two types of system operations:
+
+1.Commands—System operations that create, update, and delete data
+2.Queries—System operations that read (query) data
+...........................................................................................
+1.Domain
+2.Service 
+3.Api
+..............................................................................................
+				Implementation
+.............................................................................................
+
+How to start writing microservices?
+
+Microservices are platform and language and framework independant.
+
+Java  as Micro service implemenation technology.
+
+Java provides lot of frameworks to build microservices
+
+1.Spring Cloud on Spring Boot.
+   Spring cloud is framework which implements most of the microservices "pattern language".
+
+2.Quarkus
+    Cloud Native Microservice framework based on Microprofile specs , Microservices on J2EE platforms
+
+3.Ecplise Vertx
+    It is toolkit for building Microservices
+
+Java dialects:
+  Groovy,Kotlin,Clojurse,Scala
+
+Most of the Dialect languages has there own microservice frameworks
+
+Kotlin
+Akka and scala ....
+etc.....
+..............................................................................................
+					Spring Boot
+..............................................................................................
+
+Service : 
+ = REST
+ = GRAPHQL
+ = GRPC
+
+Spring is ioc framework, where developer dont need to create object and no need to inject into another - HAS-A
+
+in order to create object and define relationship, we need to tell the spring container.
+via
+configuration Management
+1.xml file
+2.java config 
+    ->Spring boot
+
+
+............................................................................................
+			Spring Application Configuration Managment
+............................................................................................
+
+Spring Application can be configured in many ways
+
+1.XML files  -  Old and Legacy.
+
+2.Java Config + Annotations
+
+2.1 Java Config -Manual - Write Configuration and logic
+
+ Here Dev need to write Configuration and biz logic , which makes app dev slower.
+
+Just Focus logic, automate configuration itself - AutoConfig
+
+3.AutoConfig:
+    Framework must take care of configuration based on various condtions like
+ i want web and jpa , messaging.
+                        "Birth of Spring Boot"
+
+Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications that you can "just run".
+
+We take an opinionated view of the Spring platform and third-party libraries so you can get started with minimum fuss. Most Spring Boot applications need minimal Spring configuration.
+..............................................................................................
+
+Spring Framework:
+..........................
+ beans.xml
+
+  <bean.....>
+
+ Spring Container reads beans.xml , creates beans and makes releationship among them. - DI
+............................................................................................
+DI automations:
+    <bean id="cust" autowire="byType" class="com.valtech.spring.beans.di.autowire.Customer">
+        <property name="id" value="1"/>
+        <property name="name" value="default"/>
+    </bean>
+    <bean id="address" class="com.valtech.spring.beans.di.autowire.Address">
+        <property name="city" value="coimbatore"/>
+    </bean>
+...................................................................................
+ Container Extensions:
+    Enchaning container features.
+
+ -Annotations Processing
+ -etc....
+
+Automation - Annoation Scanner
+  Reduction boiler plate code for annotation processing.
+
+
+How to tell spring container to scan annotations?
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+	
+</beans>
+
+Advanced Annoation: Streo Type annotations; to create bean itself
+
+
+@Component
+@Service
+@Repository
+@Controller
+
+ <context:annotation-config /> - for JSR 25O annotations
+ <context:component-scan base-package="com.valtech.spring.beans.automation"/>
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--scanner for common Annotation -->
+    <context:annotation-config/>
+    <!--    Scanner for StreoType Annotations-->
+    <context:component-scan base-package="com.valtech.spring.beans.automation"/>
+</beans>
+............................................................................................
+
+Spring Boot is advanced ,automated Configuration System, which reduces boiler plate code.
+
+Spring Boot => [Java Config + Profiles + EnableAnntation]
+
+
+We take an opinionated view of the Spring platform
+   Opinion: what we need for given problem , i want to create simple Web app, with some default datasource.
+    "Declarative rules",through which we can create setup and app.
+
+  You dont need to setup web modules, data source modules.....
+ 
+
+Spring Boot Focus Mainly Configuration
+
+1.Build Configuration
+2.Application Configuration.
+
+
+Spring Boot:
+
+1.Embeded Tomcat.
+   Microservices are running in isloation.
+2.App distribution is not war
+   jar /fat-jar /uber-jar
+  fat jar is executable jar, which embeds app code + runtime(tomcat/container).
+
+3.Provide opinionated 'starter' dependencies to simplify your build configuration
+     Looks like profie based configuration which is applied even for pom dependencies
+
+4.Automatically configure Spring and 3rd party libraries whenever possible
+    Via autoconfiguration and class path scanning.
+ 		
+5.Micro service features are enabled by default
+	Provide production-ready features such as metrics, health checks, and externalized configuration
+	
+
+Reactive MicroServices:
+ In Spring Boot , we can build reactive programming with help of project reactor, spring offers "spring webflux" is wrapper for building reactive microservices.
+
+Running Spring Boot App:
+
+via ide , run main method
+via mvn command
+
+windows
+mvn spring-boot:run
+mvnw spring-boot:run
+
+Linux
+./mvnw spring-boot:run
+..............................................................................................
+
+Configuration and auto Auto Configuration:
+
+Configuration is for creating beans.
+
+How beans can be created?
+
+
+ Old Spring
+						    - XML
+ SpringContainer--------scans ----configuration ---
+                                                   - JavaConfig
+
+
+ SpringContainer--------scans ----@Configuration && @ComponentScan -- config files and classes
+
+
+ Bean Creation with conditions: @Profiles and @Environment
+
+ SpringContainer--------scans ----@Configuration && @ComponentScan --@Profile('profile') -- config files and classes
+
+
+In Old spring conditions are very limited: what if want to create beans and configurations based on various rules : Auto Configuration.
+
+Autoconfiguration is automatically creates beans and configurations based on "some declarative rules" -  Conditional Annotations.
+
+
+Spring Container
+
+ Building config - based on starter dependency.
+ bean creations  - based on autoconfiguration
+..............................................................................................
+				 Microservices - Service Design
+.............................................................................................
+
+Patterns lanaguage : Level-0 Service Design.
+
+How to design service?
+
+How to design api?
+-REST API
+-Graphql api
+-rpc api
+
+.............................................................................................
+                                 REST
+............................................................................................
+
+A Service can be Object, which exposes api, the apis are bound with HTTP Methods/verbs we call 
+RESTFULL WebService.
+
+Resource class:
+
+ POJO class , holding data.
+
+
+RestController:
+
+package com.dell.microservice.rest.api;
+
+import com.dell.microservice.rest.api.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(path = "/api")
+public class OrderController {
+
+    @Autowired // Dependency Injection
+    private OrderService orderService;
+
+    @GetMapping("/orders")
+    public ResponseEntity findAllOrder() {
+        return ResponseEntity.ok(orderService.findAllOrder());
+    }
+
+    //Return orders based on critera
+    @GetMapping("/orders/{name}") //here @PathVariable is done as di which is eq to @Autowired
+    public ResponseEntity findOrderByName(@PathVariable(value = "name") String name) {
+        List<String> filteredOrders = orderService.findOrderByName(name);
+        return ResponseEntity.ok(filteredOrders);
+    }
+
+    //http://localhost:8080/api/customers/filter?ranking=prime
+    @GetMapping(value = "/customers/filter")//here RequestParam is also di annotation
+    public ResponseEntity filter(@RequestParam(value = "ranking") String ranking) {
+        List<String> filteredOrders = orderService.findOrderByName(ranking);
+        return ResponseEntity.ok(filteredOrders);
+    }
+
+}
+package com.dell.microservice.rest.api.service;
+
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class OrderService {
+    List<String> orders = Arrays.asList("Dress", "Phone", "TV");
+
+    public List<String> findAllOrder() {
+        return orders;
+    }
+
+    //filtered order
+    public List<String> findOrderByName(String input) {
+        if (input == null) {
+            return orders;
+        }
+        //java streams
+        return orders.stream().filter(s -> s.contains(input)).collect(Collectors.toList());
+    }
+}
+.............................................................................................
+				Spring Boot and Data Layer : Spring Data
+............................................................................................
+
+    <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <!--		jdbc driver-->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+
+package com.dell.microservice.rest.api.entites;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Customer {
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Long id;
+    private String firstName;
+    private String lastName;
+
+    protected Customer() {}
+
+    public Customer(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Customer[id=%d, firstName='%s', lastName='%s']",
+                id, firstName, lastName);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+}
+
+
+package com.dell.microservice.rest.api.dao;
+
+import com.dell.microservice.rest.api.entites.Customer;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface CustomerRepository extends JpaRepository<Customer,Long> {
+    //todo: Your own data logic: Most of the CURD OPERATIONS ARE DEFAULT
+    List<Customer> findByLastName(String lastName);
+    Customer findById(long id);
+}
+
+package com.dell.microservice.rest.api;
+
+import com.dell.microservice.rest.api.dao.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/customers")
+public class CustomerController {
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @GetMapping("/list")
+    public ResponseEntity findAllCustomer() {
+        return ResponseEntity.ok(customerRepository.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity findCustomerById(@PathVariable(value = "id") Long id) {
+        return ResponseEntity.ok(customerRepository.findById(id));
+    }
+}
+..............................................................................................
+
+Deploying spring boot app.
+
+Packaging Format
+
+ -jar -  fat-jar /uber-jar 
+
+A Fat JAR is a single JAR file that contains all the compiled Java classes from your project, and all compiled Java classes from all JAR files your project depends on (see Maven Dependencies). ... Fat JARs are handy when you need to build an executable JAR file, e.g. a microservice executable.
+
+.............................................................................................
+			   Spring Boot  Application In Production
+............................................................................................
+
+Package the Application:
+
+  -Jar File Model
+
+Spring boot packs the application using jar pattern called "fat jar"/Uber jar..
+
+Legacy Application package format:
+
+1.jar - plain jar
+2.war 
+3.Ear 
+
+The application packed into war and deployed on Web containers -  Tomcat,Jboss,Weblogic....
+ -Monolith style.
+
+MicroServices apps packed small and small apps, deployed on Virtual Envs-  vms,containers.
+
+The application is packaged along containers(embeded container -tomcat,netty)
+
+In order to pack app in optimizted way, the model was dervied called "fat/uber" jar.
+
+The fat jar is suitable for vm envs.
+
+How to create fat jars and how to run it?
+
+mvn clean package
+
+java -jar target/spring-boot-actuator-example-0.0.1-SNAPSHOT.jar
+..............................................................................................
+				 GraphQL Service Implementation
+..............................................................................................
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
