@@ -1,0 +1,37 @@
+#Api specification : done via SCHEMA Defintion language
+
+#HTTP Operation type : GET-read, POST-CREATE,PUT-UPDATE,DELETE-REMOVE
+#Graphql Operation Type : Query - read, Mutation- CREATE,UPDATE,DELETE, Subscription-streaming
+type Query {
+    #Operation Name/api name
+    hello:String
+    movie:Movie
+    shows:[Show]
+}
+#Mutation : add,update,delete
+type Mutation {
+    addRating(input:RatingInput):Rating
+}
+
+input RatingInput {
+    title:String
+    stars:Int
+}
+
+type Rating {
+    avgStars:Int
+}
+type Show {
+    title:String
+    releaseYear:String
+}
+type Movie {
+    id:ID
+    title:String
+    hero:Hero
+}
+type Hero {
+    heroId:ID
+    name:String
+    city:String
+}

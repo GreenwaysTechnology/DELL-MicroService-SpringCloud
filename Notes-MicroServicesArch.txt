@@ -2166,8 +2166,138 @@ Testing:
 Request to Proxy/API Gate Way Server. which intern routes the request to Backend Services
 http://localhost:8080/books/checked-out
 ............................................................................................
-				  MicroService Reslience Patterns
+			  MicroService Reslience Patterns
 ............................................................................................
+
+How to ensure the realiability of service calls.
+
+How to handle exections in distributed env/Micro services?
+
+  if service-A calls Service-B , if Service-B is slow
+          TimeoutException to be thrown.
+
+  if Service-A calls Service-B  , if Service-B is throwing Exceptions(checked/Runtime)
+           Exception to be propagated to caller, then caller will handle that exception and close the flow.
+
+Resilence Patterns help to handle exceptions in different way , without stopping the application  - safe exception handling.
+
+
+Resilence Patterns:
+..................
+1.Circuit Breaker
+2.BulkHead
+3.Timeout
+4.RateLimiter
+5.Retry
+
+Spring Cloud Circuit Breaker:
+
+  It is abstraction in SPring cloud to write resience applications
+
+There are many vendors provide Resilence Implementations
+
+1.Netfix Hystrix
+
+2.Resilience4J
+
+3.Sentinel
+
+4.Spring Retry
+
+
+class ServiceA {
+
+  private ServiceB serviceb
+
+  public void getData(){
+     
+    try{
+      //risky code : error 
+      Data = serviceb.getData();
+      Handle Data to the caller
+    }
+    catch(Exception es){
+       //handle it.and give some alternate result , dont stop the application.
+     log es
+     
+    }
+  }
+}
+
+ 
+class ServiceB{
+
+public Something getData(){
+          
+     return SOmething;
+  }
+
+}
+
+}
+
+With Resilence Patterns:
+
+class ServiceA {
+
+  private ServiceB serviceb
+
+  public void getData(){
+     
+    //Wrap the call inside Reslience Pattern Objects 
+    bulkHead {
+       call Your risky code
+    }
+    circuit Breaker {
+       call Your risky code
+    }
+    Retry {
+          call Your risky code
+    }
+   } 
+  }
+}
+..............................................................................................
+				 Rate Limiter
+.............................................................................................
+
+Rate Limiting can be applied in two perspective.
+
+1.As a Service Provider
+  We can implement rate limiter to protect our services from overload and Denial of Service 
+Attacks  
+
+
+2.As a Service Consumer
+  As a  Service Consumer , we want to ensure that we are not overloading the service provider.
+
+
+..............................................................................................
+				  TimeLimitter -Timeout
+..............................................................................................
+
+When Service-A calls Service-B , if service is slow than expected time of Caller,TimeoutException.
+.............................................................................................
+				  Retry - To avoid Fail Fast
+............................................................................................
+
+The maximum number of retry attempts
+The wait duration between successive attempts
+A custom Predicate which evaluates if a certain response should trigger a retry attempt
+A custom Predicate which evaluates if an exception should trigger a retry attempt
+A list of exceptions which should trigger a retry attempt
+A list of exceptions which should be ignored and not trigger a retry attempt
+.............................................................................................
+				CircuitBreaker
+
+A state machine with three states: CLOSED, OPEN, HALF_OPEN
+Configurable threshold value for the error rate
+Allows a configurable number of test calls in the HALF_OPEN state
+Saves the status of function calls in a two-bit ring Buffer
+Array with 16 long (64-bit) values ​​can save the status of 1024 calls
+No rolling time window
+..............................................................................................
+
 
 
 
