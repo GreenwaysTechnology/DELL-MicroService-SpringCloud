@@ -814,31 +814,1360 @@ java -jar target/spring-boot-actuator-example-0.0.1-SNAPSHOT.jar
 				 GraphQL Service Implementation
 ..............................................................................................
 
+GraphQL is a programming language for building apis.
+GraphQL works on top of http protocal only.
+GraphQL is web application only.
+GraphQL deals data format as json.
+
+Why GraphQL API is better than REST API?
+
+
+Client -------Request--------->REST API
+
+/api/products => list of products
+/api/products/1 => get single product
+/api/products/1/reviews/ get review of product 1
+
+/api/products:
+ { 
+   id
+   name
+   imageurl
+   stock
+   qty
+   price
+   .......
+ }
+
+Use case 1 :  /api/products : i want only id,name,imageUrl
+
+Use case 2 :  /api/products : i want only id,name,stock
+
+.........................................................................................
+
+Data Reterival :
+
+ /users - all users
+
+ /users/1 - one user
+
+ /users/1/friends -  one user and his all friends
+
+ /users/1/friends/10 - one user and his single friend details
+
+
+ /users/1/friends/
+
+  single request-----------single user
+				------------friends--multiple records
+
+  composit data : n +1
+	 -1 request
+            -n
+            -n
+            -n
+
+.............................................................................................
+
+				REST and GraphQL Spec
+
+
+GraphQL follows spec.
+  Query language spec
+  Schema language spec
+
+GraphQL provides two sub set language:
+
+1.GraphQL Query Language  - client side
+https://graphql.org/learn/
+
+2.GraphQL Schema Language - Server side
+  
+
+GraphQL DGS Implementation:
+
+#Api specification : done via SCHEMA Defintion language
+
+#HTTP Operation type : GET-read, POST-CREATE,PUT-UPDATE,DELETE-REMOVE
+#Graphql Operation Type : Query - read, Mutation- CREATE,UPDATE,DELETE, Subscription-streaming
+type Query {
+    #Operation Name/api name
+    hello:String
+    movie:Movie
+    shows:[Show]
+}
+type Show {
+    title:String
+    releaseYear:String
+}
+type Movie {
+    id:ID
+    title:String
+    hero:Hero
+}
+type Hero {
+    heroId:ID
+    name:String
+    city:String
+}
+
+package com.dell.graphql;
+
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsQuery;
+
+//Which is service class eq to RestController
+@DgsComponent
+public class HelloDataFetcher {
+    //api
+    @DgsQuery(field = "hello")
+    public String sayHello() {
+        return "Hello GraphQl";
+    }
+}
+
+package com.dell.graphql;
+
+import com.dell.graphql.models.Hero;
+import com.dell.graphql.models.Movie;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsData;
+
+@DgsComponent
+public class MovieDataFetcher {
+
+    @DgsData(parentType = "Query",field = "movie")
+    public Movie showMovie() {
+        return new Movie("1", "Mission Impossible", new Hero("1", "Tom", "New York"));
+    }
+}
+
+package com.dell.graphql;
+
+import com.dell.graphql.models.Show;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsQuery;
+
+import java.util.List;
+
+@DgsComponent
+public class ShowDataFetcher {
+
+    @DgsQuery(field = "shows")
+    public List<Show> shows() {
+        return List.of(new Show("The Mummy", 1999), new Show("The Matrix", 2000));
+    }
+}
+package com.dell.graphql;
+
+import com.dell.graphql.models.Hero;
+import com.dell.graphql.models.Movie;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsData;
+
+@DgsComponent
+public class MovieDataFetcher {
+
+    @DgsData(parentType = "Query",field = "movie")
+    public Movie showMovie() {
+        return new Movie("1", "Mission Impossible", new Hero("1", "Tom", "New York"));
+    }
+}
+
+package com.dell.graphql;
+
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsQuery;
+
+//Which is service class eq to RestController
+@DgsComponent
+public class HelloDataFetcher {
+    //api
+    @DgsQuery(field = "hello")
+    public String sayHello() {
+        return "Hello GraphQl";
+    }
+}
+
+package com.dell.graphql.models;
+
+public class Hero {
+    private String heroId;
+    private String name;
+    private String city;
+
+    public Hero(String heroId, String name, String city) {
+        this.heroId = heroId;
+        this.name = name;
+        this.city = city;
+    }
+
+    public String getHeroId() {
+        return heroId;
+    }
+
+    public void setHeroId(String heroId) {
+        this.heroId = heroId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+}
+
+package com.dell.graphql.models;
+
+public class Movie {
+    private String id;
+    private String title;
+    private Hero hero;
+
+    public Movie(String id, String title, Hero hero) {
+        this.id = id;
+        this.title = title;
+        this.hero = hero;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Hero getHero() {
+        return hero;
+    }
+
+    public void setHero(Hero hero) {
+        this.hero = hero;
+    }
+}
+
+package com.dell.graphql.models;
+
+public class Show {
+    private String title;
+    private int releaseYear;
+
+    public Show(String title, int releaseYear) {
+        this.title = title;
+        this.releaseYear = releaseYear;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getReleaseYear() {
+        return releaseYear;
+    }
+
+    public void setReleaseYear(int releaseYear) {
+        this.releaseYear = releaseYear;
+    }
+}
+
+
+Mutation:
+type Mutation {
+    addRating(input:RatingInput):Rating
+}
+
+input RatingInput {
+    title:String
+    stars:Int
+}
+
+type Rating {
+    avgStars:Int
+}
+package com.dell.graphql;
+
+import com.dell.graphql.models.Rating;
+import com.dell.graphql.models.RatingInput;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.InputArgument;
+
+@DgsComponent
+public class ReviewMutation {
+
+    //add
+    @DgsMutation(field = "addRating")
+    public Rating addRating(@InputArgument("input") RatingInput ratingInput) {
+        //biz logic to save rating into database
+        System.out.println("Rated :" + ratingInput.getTitle() + "with " + " " + ratingInput.getStars());
+        return new Rating(ratingInput.getStars());
+    }
+}
+package com.dell.graphql.models;
+
+
+public class RatingInput {
+    private String title;
+    private Integer stars;
+
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Integer getStars() {
+        return stars;
+    }
+
+    public void setStars(Integer stars) {
+        this.stars = stars;
+    }
+}
+package com.dell.graphql.models;
+
+public class Rating {
+    private String title;
+    private Integer avgStars;
+
+    public Rating(Integer avgStars) {
+        this.avgStars = avgStars;
+    }
+
+    public Rating(String title, Integer stars) {
+        this.title = title;
+        this.avgStars = stars;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Integer getStars() {
+        return avgStars;
+    }
+
+    public void setStars(Integer avgStars) {
+        this.avgStars = avgStars;
+    }
+}
+..............................................................................................
+			 Micro Services Design pattern Implemenations
+..............................................................................................
+
+Micro service are loosly coupled applications , which has apis, can be REST,Graphql,RPC,Messages.
+
+Common Things we need to take of Microservice Development
+.........................................................
+
+
+1.Configuration Management infrastructure
+
+Spring and Microservice Implementation:
+.......................................
+Spring team provides an project called Spring Cloud.
+
+Spring cloud offers implementation for microservice infrastructure.
+
+1.Distributed/versioned configuration
+
+2.Service registration and discovery
+
+3.Routing
+
+4.Service-to-service calls
+
+4.Load balancing
+
+5.Circuit Breakers
+
+6.Global locks
+
+7.Leadership election and cluster state
+
+8.Distributed messaging
+..........................................................................................
+
+If you want to implement microservice apps, we need infrastructure components.
+
+-Service Registry and Discovery
+   ->Many people are giving service registeries
+      -Consul
+      -Apache Zoo Keeper
+      -Apache Ignite
+      -Netflix
+         -Eureka 
+      -Kubernets
+
+--etc.....
+..............................................................................................
+				    Distributed configuration
+..............................................................................................
+
+
+There are two actors in the configuration
+
+1.Configuration Provider
+2.Configuration Server/Broker
+3.Consumer typically DOMAIN Services
+
+
+1.Configuration Provider.
+ local disk file
+ Remote git repos
+ LDap server
+ noSql severs
+ Vaults
+
+Note: Spring cloud config by default provides "git" as backend. 
+
+
+2.Configuration Server
+  Simple Spring Boot Application
+  @EnableConfigServer
+  Config Server is just simple WebApplication, exposes REST endpoints  behind scene.
+
+
+3.Configuration Client
+   Who uses existing spring PropertyResource and Enviroment Abstractions
+
+
+How to setup config server?
+
+spring.cloud.config.server.git.uri=https://github.com/spring-cloud-samples/config-repo
+
+ Telling the location of Provider
+
+git location can be github /git lab or local git repository
+
+spring.cloud.config.server.git.uri =  can be http or local file system.
+
+if you are using local git , before using create git repositor
+
+$ cd $HOME
+$ mkdir config-repo
+$ cd config-repo
+$ git init .
+$ create this file - test-dev.properties
+$ git add  .
+$ git commit -m "Add application.properties"
+
+spring.cloud.config.server.git.uri=file:///E:/session/example-app-config
+
+.........................................................................................
+
+Server
+
+pom.xml
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+		</dependency>
+example:
+
+application.properties
+
+server.port=8081
+#Basic Config Server Properties
+#spring.cloud.config.server.git.uri=https://github.com/spring-cloud-samples/config-repo
+spring.cloud.config.server.git.uri=file:///E:/session/example-app-config
+
+package com.dell.microservice.config;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.config.server.EnableConfigServer;
+
+@SpringBootApplication
+@EnableConfigServer
+public class MicroserviceConfigServerApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(MicroserviceConfigServerApplication.class, args);
+	}
+
+}
+
+......
+
+client side
+
+pom.xml
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+
+bootstrap.properties
+
+spring.cloud.config.uri=http://localhost:8081
+spring.application.name=test,test2
+spring.profiles.active=dev
+
+application.properties
+
+management.endpoints.web.exposure.include=*
+
+
+package com.dell.microservice.client;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RefreshScope
+public class GreetingController {
+
+    @Value("${test.greeting}")
+    private String message;
+
+    @GetMapping("/message")
+    String getMessage() {
+        return this.message;
+    }
+}
+
+.....
+Auto referesh : Update
+
+POST http://localhost:8080/actuator/refresh
+[
+    "config.client.version",
+    "test.greeting"
+]
+Check the value
+
+
+application.properties
+
+We can override these in code, command-line arguments, ServletConfig init parameters, ServletContext init parameters, Java system properties, operating system variables, and application properties file.
+
+An important thing to keep in mind is that these application properties files have the lowest precedence compared to other forms of overriding application context properties.
+
+We tend to group properties that we can override in the application context:
+
+Core properties (logging properties, thread properties)
+Integration properties (RabbitMQ properties, ActiveMQ properties)
+Web properties (HTTP properties, MVC properties)
+Security properties (LDAP properties, OAuth2 properties)
+
+bootstrap.properties
+
+We use bootstrap.yml or bootstrap.properties for configuring the bootstrap context. This way we keep the external configuration for bootstrap and main context nicely separated.
+
+The bootstrap context is responsible for loading configuration properties from the external sources and for decrypting properties in the local external configuration files.
+
+.............................................................................................
+				  Vault -Harishop : Distributed Configuration
+..........................................................................................
+
+Vault as configuration system.
+
+Steps:
+
+1.Setup vault
+
+install vault binary
+install via docker
+
+https://learn.hashicorp.com/tutorials/vault/getting-started-install?in=vault/getting-started
+
+2.start vault server
+vault server -dev
+
+3.set env valult add variable
+set VAULT_ADDR=http://127.0.0.1:8200
+
+4.You can store data into vault
+
+vault kv put secret/application foo=bar baz=bam
+Key                Value
+---                -----
+created_time       2021-12-22T09:47:07.0739196Z
+custom_metadata    <nil>
+deletion_time      n/a
+destroyed          false
+version            1
+
+1.Create Config Server
+
+pom.xml
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+		</dependency>
+
+application.properties /application.yml
+
+spring:
+  profiles:
+    active: vault
+  cloud.config.server.vault.kvVersion: 2
+server:
+  port: 8888
+
+package org.springframework.cloud.vaultconfigserver;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.config.server.EnableConfigServer;
+
+@SpringBootApplication
+@EnableConfigServer
+public class VaultConfigServerApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(VaultConfigServerApplication.class, args);
+	}
+}
+...........................................................................................
+
+Config Client:
+pom.xml
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+bootstrap.yml /boostrap.properties
+
+spring:
+  cloud:
+    config:
+      token:  s.jEk9S5YVcOi78GcqOtEt660N
+
+Note:
+ copy the  token from valut server
+ 
+
+package org.springframework.cloud.vaultconfigclient;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+public class VaultConfigClientApplication implements CommandLineRunner {
+    Logger LOG = LoggerFactory.getLogger(VaultConfigClientApplication.class);
+
+    @Value("${foo}")
+    String foo;
+
+    @Value("${baz}")
+    String bar;
+
+    public static void main(String[] args) {
+        SpringApplication.run(VaultConfigClientApplication.class, args);
+    }
+
+    @GetMapping("/myinfo")
+    public ResponseEntity returnValut() {
+        return ResponseEntity.ok(foo + " " + bar);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        LOG.info("Foo: " + foo);
+        LOG.info("Bar: " + bar);
+    }
+}
+.............................................................................................
+				  Service to Service Communication
+.............................................................................................	
+
+REST API Communication : REST TO REST.
+ONE REST api is consumer and Another REST API is provider.
+
+1.Provider Service
+
+2.Consumer Service
+
+REST:
+How rest apis can talk each other.
+
+Spring Boot implemetation
+
+1.RestTemplate
+ 
+ RestTemplate is a synchronous client to perform HTTP requests. It is the original Spring REST client and exposes a simple, template-method API over underlying HTTP client libraries.
+
+2.WebClient
+  
+ WebClient is a non-blocking, reactive client to perform HTTP requests. It was introduced in 5.0 and offers a modern alternative to the RestTemplate, with efficient support for both synchronous and asynchronous, as well as streaming scenarios.
+
+3.Spring Cloud OpenFeign
+
+
+RestTemplate
+................
+
+ -It is spring bean, so you have to create,
+
+ you can create inside config file or inside main file
+
+ @Bean
+  public RestTemplate resttemplate(){
+      return new RestTemplate();
+ }
+getForObject :Retrieves a representation via GET.
+
+getForEntity:Retrieves a ResponseEntity (that is, status, headers, and body) by using GET.
+
+...
+server.port=8081
+
+package com.dell.microservice;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+
+@SpringBootApplication
+public class HelloConsumerserviceApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(HelloConsumerserviceApplication.class, args);
+    }
+
+    @Bean
+    public RestTemplate resttemplate() {
+        return new RestTemplate();
+    }
+}
+
+package com.dell.microservice;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+@RestController
+public class ConsumerController {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+
+    //call api using rest template
+    @GetMapping(value = "/client")
+    public ResponseEntity<Hello> helloV1() {
+        String url = "http://localhost:8080/hello";
+        Hello helloResponse = restTemplate.getForObject(url, Hello.class);
+        return ResponseEntity.status(200).body(helloResponse);
+    }
+}
+
+
+Start Provider app
+
+Start Consumer app
+
+http://localhost:8081/client
+
+{
+message: "I am from HelloController "
+}
+.............................................................................................
+
+String url = "http://localhost:8080/hello";
+
+The above code works with hardcoded urls
+
+What if the url changes,particulary port changes
+
+incase of Dynamic Ports, ports randomly assinged by cloud/containers...
+
+String url = "http://localhost:{?}/hello";
+
+How to solve this?
+
+ Using DNS
+ Using Service Registry and Discovery
+..............................................................................................
+				Service Registry
+.............................................................................................
+
+Sevice Registry:
+
+->It is data base /Data store
+  Stores Resources - Service informations - name of the service,ip address, port.....
+->It is key-value pair models - NOSQL Based
+
+Service registry is not new concept.
+  -DNS servers
+  -Naming servers
+etc.....
+
+Service Registry Servers:
+  
+1.Apache ZooKeeper
+2.Consul
+3.APACHE IGNITE
+4.Netflix Eureka
+etc.......
+
+Discovery:
+ It is process of looking up of services from the Registery Servers
+
+Advantages:
+
+ 1.Client Application and Provider Applicaiton dont need to talk directly.
+ 2.Client Apps dont need to query by extact port and domain name rather than , service name.
+
+Discovery Types ;
+
+1.client-side discovery
+
+2.server-side discovery
+
+Service Disovery:
+
+  Services typically need to call one another.
+
+ In a monolithic application, services invoke one another through language-level method or procedure calls. In a traditional distributed system deployment, services run at fixed, well known locations (hosts and ports) and so can easily call one another using HTTP/REST or some RPC mechanism. 
+ However, a modern microservice-based application typically runs in a virtualized or containerized environments where the number of instances of a service and their locations changes dynamically.
+
+
+             "Service Discovery is in short , Clients/Consumers are going to locate services"
+
+1.client-side discovery
+
+ =>When using client side discovery the client is responsible for determining the network locations of available services instances and load balance requests across them.
+
+ =>Client queries a service registry, which database of service instances. Then client uses a load balancing algorthim to select one of the available service instances and a make a request.
+
+
+2.Server side discovery
+
+  =>When using server side discovery, client makes a request to via a load balancer
+  =>Loadbalancer quries services instances, returns a reference
+
+..............................................................................................
+
+Client Side Discovery Implementation
+
+1.Netflix Eureka
+2.Kubernets
+3.Apache ZooKeeper
+4.Consul
+etc.....
+
+
+1.Service Registry
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		</dependency>
+
+
+2.application.properties
+server.port=8761
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+logging.level.com.netflix.eureka=OFF
+logging.level.com.netflix.discovery=OFF
+
+3.package com.dell.registry;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@SpringBootApplication
+@EnableEurekaServer
+public class ServiceRegisteryApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ServiceRegisteryApplication.class, args);
+	}
+
+}
+.............................................................................................
+
+Provider Service:
+...............
+
+pom.xml
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+
+application.properties
+
+eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+spring.application.name=hello-service
+server.port=${PORT:0}
+eureka.instance.instance-id=${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+
+Main Code
+package com.hello;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+
+@SpringBootApplication
+@EnableEurekaClient
+public class HelloServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(HelloServiceApplication.class, args);
+	}
+
+}
+
+Run the Client and Test Whether this app has been registered with EUREKA Registry Server
+
+...........................................................................................
+
+Consumer
+
+pom.xml
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+
+application.properties
+
+eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+spring.application.name=hello-webclient-service
+server.port=${PORT:0}
+eureka.instance.instance-id=${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+package com.hello.client;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+
+@SpringBootApplication
+@EnableEurekaClient
+public class HelloWebclientServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(HelloWebclientServiceApplication.class, args);
+	}
+
+	@Bean
+	RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
+}
+..............................................................................................
+
+Service Communication via Eureka Service Registry:
+..................................................
+
+ @Autowired
+ private DiscoveryClient discoveryClient;
+
+
+There are different ways through which we can query instances.
+
+
+1.hardcoded way of getting instances
+
+
+    @GetMapping("/")
+    public String sayHello() {
+        return "Hello";
+    }
+
+    @GetMapping(value = "/client/dynamic")
+    public ResponseEntity helloV2() {
+        List<ServiceInstance> instances = discoveryClient.getInstances("hello-service");
+        Hello helloResponse = null;
+        if (instances != null && instances.size() > 0) {
+            ServiceInstance serviceInstance = instances.get(0);
+            System.out.println(serviceInstance.getHost() + " " + serviceInstance.getPort() + " " + serviceInstance.getServiceId());
+            System.out.println(serviceInstance.getInstanceId());
+            String service_Name = serviceInstance.getServiceId();
+            String url = "http://" + service_Name + "/hello";
+            helloResponse = restTemplate.getForObject(url,
+                    Hello.class);
+            System.out.println(helloResponse);
+        }
+        return  ResponseEntity.ok(helloResponse);
+
+    }
+
+The above apporach is too complicated for all use cases.
+
+We need simple solution to talk to rest end points.
+
+ ->Spring Clouding OpenFeign Client.
+
+Declarative REST Client: Feign creates a dynamic implementation of an interface decorated with JAX-RS or Spring MVC annotations
+
+
+
+2.Getting Instances via OpenFeign Client
+
+pom.xml
+ <dependency>
+     <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+
+package com.hello.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+
+//hello-service is name of the service from HelloService
+@FeignClient("hello-service")
+public interface HelloServiceFeignClient {
+    @GetMapping("/hello")
+    ResponseEntity<Hello> hello();
+}
+
+@SpringBootApplication
+@EnableEurekaClient
+@EnableFeignClients
+public class HelloWebclientServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(HelloWebclientServiceApplication.class, args);
+	}
+
+	@Bean
+	RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
+}
+.............................................................................................
+				    Scalablity
+ 				  Load Balancing
+
+In Server-side load balancing, the instances of the service are deployed on multiple servers and then a load balancer is put in front of them. It is generally a hardware load balancer. All the incoming requests traffic firstly comes to this load balancer acting as a middle component. It then decides to which server a particular request must be directed to based on some algorithm.
+
+Disadvantages of Server-side load balancing:
+
+Server side load balancer acts as a single point of failure as if it fails, all the instances of the microservice becomes inaccessible as only load balancer has the list of servers.
+
+Since each microservice will have a separate load balancer, the overall complexity of the system increases and it becomes hard to manage.
+
+The network latency increases as the number of hops for the request increases from one to two with the load balancer, one to the load balancer and then another from load balancer to the microservice.
+
+
+2. Client-side Load Balancing
+
+The instances of the service are deployed on multiple servers. Load balancer's logic is part of the client itself, it holds the list of servers and decides to which server a particular request must be directed to based on some algorithm. These client side load balancers are also known as software load balancers.
+
+Disadvantages of Client-side load balancing
+The load balancer's logic is mixed up with the microservice code.
+
+
+............................
+
+Server side Load balancer is very usefull to manage trafic from outside applications.
+Mobile clients and webclients trafic easily can be managed.
+
+Client side load balancers are very usefull to mangae trafic inside microservice application.
+
+
+Netflix Ribbon:
+
+Netflix Ribbon is a Part of Netflix Open Source Software (Netflix OSS). It is a cloud library that provides the client-side load balancing. ... The Ribbon mainly provides client-side load balancing algorithms. It is a client-side load balancer that provides control over the behavior of HTTP and TCP client.
+
+Ribbon is a Inter Process Communication (remote procedure calls) library with built in software load balancers. The primary usage model involves REST calls with various serialization scheme support
+
+
+Following are the features of Ribbon:
+
+Load balancing: It provides client side load balancing functionality.
+
+Fault tolerance: It can be used to determine whether the servers are up or not and can also detect those servers that are down and hence, ignore them for sending the further requests.
+
+Configurable load balancing rules: 
+
+By default ribbon uses RoundRobinRule for distributing requests among servers.
+
+In addition to it, it also provides AvailabilityFilteringRule and WeightedResponseTimeRule.
+
+We can also define our custom rules as per our needs.
+
+Eg:
+        @LoadBalanced
+	@Bean
+	RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
+
+
+How to test client side balancing?
+...................................
+
+Run the application in multiple copies
+
+>java -jar target/hello-service-0.0.1-SNAPSHOT.jar
+
+>java -jar target/hello-service-0.0.1-SNAPSHOT.jar
+
+>java -jar target/hello-service-0.0.1-SNAPSHOT.jar
+
+>java -jar target/hello-service-0.0.1-SNAPSHOT.jar
+
+
+****************************************XXXXXXXXX*********************************************					 Server Side Load balancer- API GateWay
+
+
+Zull API Gate Way:
+.................
+
+Zuul is a gateway service that provides dynamic routing, monitoring, resiliency, security, and more.
+
+=>Zull is entry point to Micro Services Apps
+
+=>filtering  logics
+
+=>Request Transfermation
+
+=>Authentication
+
+=>Dynamic routing
+
+example.com ====>ApiGateWay ==> myapp
+
+
+Filter /Interceptor:
+
+  It is logic gets executed before any request processing starts
+
+
+Client ---request---/api/something----------|filter---filter--filter--|requestProcessing logic starts
+
+if we want the same concept for mircoservice architecture, that is called as "GateWay/EdgeService/LoadBalancer / Routers&Filters"
+
+
+Embedded Zuul Reverse Proxy
+.............................
+
+Spring Cloud has created an embedded Zuul proxy to ease the development of a common use case where a UI application wants to make proxy calls to one or more back end services.
+
+
+This feature is useful for a user interface to proxy to the back end services it requires, avoiding the need to manage CORS and authentication concerns independently for all the back ends.
+
+To enable it, annotate a Spring Boot main class with @EnableZuulProxy. Doing so causes local calls to be forwarded to the appropriate service. By convention, a service with an ID of users receives requests from the proxy located at /users (with the prefix stripped). The proxy uses Ribbon to locate an instance to which to forward through discovery. All requests are executed in a hystrix command, so failures appear in Hystrix metrics. Once the circuit is open, the proxy does not try to contact the service.
+
+..............................................................................................
+
+Steps:
+
+Zull Proxy Creation:
+
+
+1.Zull is WebApplication only
+
+Create SpringBoot App, add 
+<dependency>
+  <groupId>org.springframework.cloud</groupId>
+  <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+</dependency>
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
 
 
 
 
+2.Enable Zuul
+
+package com.example.routingandfilteringgateway;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+import org.springframework.context.annotation.Bean;
+import com.example.routingandfilteringgateway.filters.pre.SimpleFilter;
+
+@EnableZuulProxy
+@SpringBootApplication
+public class RoutingAndFilteringGatewayApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(RoutingAndFilteringGatewayApplication.class, args);
+  }
+
+  @Bean
+  public SimpleFilter simpleFilter() {
+    return new SimpleFilter();
+  }
 
 
+}
 
+Filter
+package com.example.routingandfilteringgateway.filters.pre;
 
+import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 
+public class SimpleFilter extends ZuulFilter {
 
+    private static Logger log = LoggerFactory.getLogger(SimpleFilter.class);
 
+    @Override
+    public String filterType() {
+        return "pre";
+    }
 
+    @Override
+    public int filterOrder() {
+        return 1;
+    }
 
+    @Override
+    public boolean shouldFilter() {
+        return true;
+    }
 
+    @Override
+    public Object run() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletRequest request = ctx.getRequest();
 
+        log.info(String.format("%s request to %s", request.getMethod(), request.getRequestURL().toString()));
 
+        return null;
+    }
 
+}
 
+application.properties
+#Routing rules
+zuul.routes.books.url=http://localhost:8090
+#zuul.routes.customers.url=http://localhost:8081
+ribbon.eureka.enabled=false
+server.port=8080
+server.port=8080
 
+.......................................................................................
+Micro Service Code:
+.................
 
+package com.example.routingandfilteringbook;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
+@SpringBootApplication
+public class RoutingAndFilteringBookApplication {
 
+  @RequestMapping(value = "/available")
+  public String available() {
+    return "Spring in Action";
+  }
 
+  @RequestMapping(value = "/checked-out")
+  public String checkedOut() {
+    return "Spring Boot in Action";
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(RoutingAndFilteringBookApplication.class, args);
+  }
+}
+
+application.properties
+spring.application.name=book
+server.port=8090
+
+Testing:
+Request to Proxy/API Gate Way Server. which intern routes the request to Backend Services
+http://localhost:8080/books/checked-out
+............................................................................................
+				  MicroService Reslience Patterns
+............................................................................................
 
 
 
