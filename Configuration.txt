@@ -1,0 +1,102 @@
+Externalized Configuration:
+
+-Property values can be injected directly into your beans by using the @Value annotation,
+-accessed through Spring’s Environment abstraction
+- be bound to structured objects through @ConfigurationProperties
+
+
+1 Command-line arguments
+2 SPRING_APPLICATION_JSON, an operating system environment variable or JVM
+system property that contains JSON
+JVM System properties
+Operating system environment variables
+A configuration file in the current directory
+
+
+
+PUSH based configuration:
+The push model is an effective and widely used mechanism for configuring a service.
+One limitation, however, is that reconfiguring a running service might be challenging,
+if not impossible. The deployment infrastructure might not allow you to
+change the externalized configuration of a running service without restarting it.
+
+1 Command-line arguments
+
+config-app>mvn clean build
+
+config-app>java -jar target/config-app-0.0.1-SNAPSHOT.jar --name=Ram
+
+2.SPRING_APPLICATION_JSON as Operting system env variable
+config-app>set SPRING_APPLICATION_JSON={"name":"geetha"}
+
+config-app>java -jar target/config-app-0.0.1-SNAPSHOT.jar
+
+
+PULL based configuration:
+..........................
+In the pull model, a service instance reads its configuration properties from a configuration
+server.
+
+Distributed Configuration
+
+The Spring Cloud Config project is a good example of a configuration server-based
+framework. It consists of a server and a client.
+
+The server supports a variety of backends
+for storing configuration properties, including version control systems, databases, and
+Hashicorp Vault.
+
+With the Config Server, you have a central place to manage external properties for applications across all environments.
+
+The client retrieves configuration properties from the server and
+injects them into the Spring ApplicationContext
+
+Why Spring cloud Config:
+Centralized configuration—All the configuration properties are stored in one
+place, which makes them easier to manage. What’s more, in order to eliminate
+duplicate configuration properties, some implementations let you define global
+defaults, which can be overridden on a per-service basis.
+ Transparent decryption of sensitive data—Encrypting sensitive data such as database
+credentials is a security best practice. One challenge of using encryption, though,
+is that usually the service instance needs to decrypt them, which means it needs
+the encryption keys. Some configuration server implementations automatically
+decrypt properties before returning them to the service.
+ Dynamic reconfiguration—A service could potentially detect updated property values
+by, for example, polling, and reconfigure itself
+
+
+Steps:
+
+1.config Server:
+
+->It is web server, it transfer config data via REST end points
+->Client Apps talks to web server, get config data.
+->Config server must have connected "Config Store".
+
+
+Config Store:
+1.file system
+2.git repo
+3.vault
+
+
+@SpringBootApplication
+@EnableConfigServer
+public class ConfigServer {
+  public static void main(String[] args) {
+    SpringApplication.run(ConfigServer.class, args);
+  }
+}
+
+...
+
+
+
+
+
+
+
+
+
+
+

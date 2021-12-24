@@ -2297,6 +2297,880 @@ Saves the status of function calls in a two-bit ring Buffer
 Array with 16 long (64-bit) values ​​can save the status of 1024 calls
 No rolling time window
 ..............................................................................................
+			Asynchronous and Non Blocking  Service Communication
+..............................................................................................
+
+What is async and what is non blocking?
+
+
+Request Per thread Model -  1 requet - 1 thread
+
+1000 req = 1000 thread
+1M req =1M thread
+
+Threading Models and network io:
+
+C10k -   concurrently handling ten thousand connections
+  A Web should handle 10k connections in a sec. then it is good infrastructure.
+
+Birth of Non Blocking sockets.
+
+1.solve threading issues, by reducing more no of threads
+   change the model from req per thread modle.
+   have min thread max concurrency.
+.............................................................................................
+					Java and Non blocking io
+.............................................................................................
+
+Java primarily carries blocking io. In java 7 who introduced non blocking apis via nio package.
+
+Vertx is toolkit to build non blocking and async applications on jvm.
+
+Spring boot is also supporting non blocking and async application via Project Reactor.
+
+Spring Cloud and Boot supports non blocking + Reactive togther to make Async Reactive Microservices apps.
+
+..............................................................................................					 Spring Boot and Non blocking apps
+..............................................................................................
+
+Spring boots uses reactive programming and along with non blocking.
+
+Reactive Programming : 
+
+ Push  model
+ PUll + Push => Reactive Streaming
+ Async - No need of blocking
+ uses limited num of threadings
+ +
+ Data Streaming in sequence.
+
+RP is platform and language indepandant.
+
+1.First Impl from Microsoft
+2.From The Netflix  on Java - Rxjava
+3.other language
+
+For JVM:
+1.Rxjava
+2.project Reactor
+3.Mutiny
+
+Spring integrated Project Reactor in various Projects
+
+1.Spring Web -  Spring WebFlux :Reactive Microservices With Spring Boot
+
+How to build reactive webservices :Microservice:REST API.
+
+
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+...........................................................................................
+Actors :
+
+Streaming  + Event Driven Models.
+Observable Design pattern
+Iterator Design Pattern
+Functional style , declarative Programming.
+
+1.Publisher - Service
+ ->Flux -  stream data  0....N  - 0...N of data
+ ->Mono -  Stream data  0...1  -  Fire and Forgot
+
+2.Subscriber -  Service
+
+  onFlux/OnMono.subscribe(eventListener);
+  
+three listners:
+1.onData Listener - for data
+2.onErroor listener - for getting errors
+3.onComplete listener - for getting complete
+
+
+package com.dell.reactive;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@RestController
+public class GreetingController {
+
+    @GetMapping("/hello/reactive")
+    public Flux<String> sayHello() {
+        //streaming 0...N
+        return Flux.just("Hello", "World", "How ", "are", "You");
+    }
+
+    @GetMapping("/goodbye/reactive")
+    public Mono<String> sayGoodBye() {
+        //streaming o...1
+        return Mono.just("Good Bye Reactor");
+    }
+
+    //just is opertor
+    @GetMapping("/greet/reactive")
+    public Mono<Greeter> sayGreet() {
+        return Mono.just(new Greeter("GreetMe"));
+    }
+
+}
+
+Data Processing Pipe Lines:
+..........................
+
+    @GetMapping("/hello/reactive/filter")
+    public Flux<String> filter() {
+        //streaming 0...N
+        return Flux
+                .just("Hello", "World", "How ", "are", "You")
+                .filter(c -> c.contains("Hello"))
+                .subscribeOn(Schedulers.immediate()) // run a separate thread of execution
+                .map(String::toUpperCase); // operator
+    }
+..........................................................................................
+			  Micro service Communication
+..........................................................................................
+
+Rest full service communication:
+
+1.rest Template
+2.feign client
+3.Reactive WebClient
+
+
+package com.dell.reactive;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
+@RestController
+public class GreetingController {
+
+    @GetMapping("/hello/reactive")
+    public Flux<String> sayHello() {
+        //streaming 0...N
+        return Flux.just("Hello", "World", "How ", "are", "You");
+    }
+
+    @GetMapping("/goodbye/reactive")
+    public Mono<String> sayGoodBye() {
+        //streaming o...1
+        return Mono.just("Good Bye Reactor");
+    }
+
+    //just is opertor
+    @GetMapping("/greet/reactive")
+    public Mono<Greeter> sayGreet() {
+        return Mono.just(new Greeter("GreetMe"));
+    }
+
+    @GetMapping("/hello/reactive/filter")
+    public Flux<String> filter() {
+        //streaming 0...N
+        return Flux
+                .just("Hello", "World", "How ", "are", "You")
+                .filter(c -> c.contains("Hello"))
+                .subscribeOn(Schedulers.immediate()) // run a separate thread of execution
+                .map(String::toUpperCase); // operator
+    }
+
+}
+
+
+
+Reactive WebClient
+
+package com.dell.reactive;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+@RestController
+public class GreetingConsumer {
+    private final WebClient webClient;
+
+    public GreetingConsumer(WebClient.Builder builder) {
+        this.webClient = builder.baseUrl("http://localhost:8080").build();
+    }
+
+    @GetMapping("/webclient")
+    public Mono<String> greetConsume() {
+        return this.webClient.get()
+                .uri("/hello/reactive")
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+   
+}
+...........................................................................................
+			Async Microservices using: Message Brokers
+............................................................................................
+
+Real time Streaming with help of Streaming Platforms - RabbitMQ,Apache ActiveMQ,Kaffka...
+
+1.Traditional way of integrating Message brokers
+2.Using Spring Cloud Streaming Platform  - Event Sourcing and Domain Events Pattern
+
+
+What is Event Micro services?
+
+Event-Driven Communication is when propagating changes across serveral microservices and related domain models.
+
+That means when changes occurs, we need some to way to coordinate changes across the different modes.
+
+There are multiple patterns to acheive event driven patterns.
+
+1>messaging patterns
+....................
+
+1.ActiveMQ -  Message Broker
+
+2.Sender Spring Boot 
+  Receiver Spring Boot
+
+
+
+Sender:
+ <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-activemq</artifactId>
+        </dependency>
+
+Receiver:
+ <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-activemq</artifactId>
+        </dependency>
+
+
+Create Configuration:
+
+import org.apache.activemq.command.ActiveMQQueue;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.annotation.EnableJms;
+import javax.jms.Queue;
+
+
+@Configuration
+public class JmsConfig {
+    @Bean
+    public Queue queue(){
+        return new ActiveMQQueue("test-queue");
+    }
+}
+
+
+Publisher Code:
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import javax.jms.Queue;
+
+@RestController
+@RequestMapping("/api")
+public class MessageController {
+
+    @Autowired
+    private Queue queue;
+
+    @Autowired
+    private JmsTemplate jmsTemplate;
+
+    @GetMapping("message/{message}")
+    public ResponseEntity<String> publish(@PathVariable("message") final String message){
+
+        jmsTemplate.convertAndSend(queue, message);
+
+        return new ResponseEntity(message, HttpStatus.OK);
+    }
+
+}
+
+......................
+
+Consumer/Receiver :
+
+
+import org.apache.activemq.command.ActiveMQQueue;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.annotation.EnableJms;
+import javax.jms.Queue;
+
+
+@Configuration
+public class JmsConfig {
+    @Bean
+    public Queue queue(){
+        return new ActiveMQQueue("test-queue");
+    }
+}
+
+
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jms.annotation.EnableJms;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Component;
+
+@Component
+@EnableJms
+public class MessageConsumer {
+
+    private final Logger logger = LoggerFactory.getLogger(MessageConsumer.class);
+
+    @JmsListener(destination = "test-queue")
+    public void listener(String message){
+        logger.info("Message received {} ", message);
+    }
+}
+
+application.properties
+spring.activemq.broker-url=tcp://localhost:61616
+spring.activemq.user=admin
+spring.activemq.password=admin
+..............................................................................................
+Testing:
+http://localhost:8080/api/message/hello
+..............................................................................................
+	
+			Spring Cloud Stream: Microservice Event Driven Implmentation
+..............................................................................................
+
+Spring Cloud Stream is a framework for building highly scalable event-driven microservices connected with shared messaging systems.
+
+The framework provides a flexible programming model built on already established and familiar Spring idioms and best practices, including support for persistent pub/sub semantics, consumer groups, and stateful partitions.
+
+Destination Binders: Components responsible to provide integration with the external messaging systems.
+
+Destination Bindings: Bridge between the external messaging systems and application code (producer/consumer) provided by the end user.
+
+Message: The canonical data structure used by producers and consumers to communicate with Destination Binders (and thus other applications via external messaging systems).
+
+..............................................................................................
+
+Setup:
+
+1.Message Brokers -  RabbitMQ / Kaffaka
+2.Sender and Receiver.
+
+
+Installing software locally is more complex.
+Installing softwares via docker.
+
+
+  <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream</artifactId>
+        </dependency>
+..............................................................................................
+
+Steps : Sender 
+
+import java.util.Objects;
+
+
+/**
+ * This class defines a loan. It is associated with an applicant, has an amount, and a status.
+ */
+public class Loan {
+
+  private String uuid, name, status;
+  private long amount;
+
+  public Loan() {
+  }
+
+  public Loan(String uuid, String name, long amount) {
+    this.uuid = uuid;
+    this.name = name;
+    this.amount = amount;
+    this.setStatus(Statuses.PENDING.name());
+  }
+
+  public String getUuid() {
+    return uuid;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    if (status.equals(Statuses.APPROVED.name())
+            || status.equals(Statuses.DECLINED.name())
+            || status.equals(Statuses.PENDING.name())
+            || status.equals(Statuses.REJECTED.name())) {
+      this.status = status;
+    } else {
+      throw new IllegalArgumentException("Cannot set the LoanApplication's status to " + status);
+    }
+  }
+
+  public long getAmount() {
+    return amount;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Loan that = (Loan) o;
+    return amount == that.amount &&
+            uuid.equals(that.uuid) &&
+            name.equals(that.name) &&
+            Objects.equals(status, that.status);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(uuid, name, status, amount);
+  }
+
+  @Override
+  public String toString() {
+    return "Loan{" +
+            "uuid='" + uuid + '\'' +
+            ", name='" + name + '\'' +
+            ", status='" + status + '\'' +
+            ", amount=" + amount +
+            '}';
+  }
+}
+
+....
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.messaging.Message;
+import reactor.core.publisher.Flux;
+
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+@SpringBootApplication
+public class LoansourceApplication {
+
+  private static final Logger log = LoggerFactory.getLogger(LoansourceApplication.class);
+  private List<String> names = Arrays.asList("Donald", "Theresa", "Vladimir", "Angela", "Emmanuel", "Shinzō", "Jacinda", "Kim");
+  private List<Long> amounts = Arrays.asList(10L, 100L, 1000L, 10000L, 100000L, 1000000L, 10000000L, 100000000L, 100000000L);
+
+  public static void main(String[] args) {
+    SpringApplication.run(LoansourceApplication.class, args);
+    log.info("The Loansource Application has started...");
+  }
+
+  @Bean
+  public Supplier<Loan> supplyLoan(){
+    Supplier<Loan> loanSupplier = () -> {
+      Loan loan = new Loan(UUID.randomUUID().toString(),
+              names.get(new Random().nextInt(names.size())),
+              amounts.get(new Random().nextInt(amounts.size())));
+      log.info("{} {} for ${} for {}", loan.getStatus(), loan.getUuid(), loan.getAmount(), loan.getName());
+      return loan;
+    };
+
+    return loanSupplier;
+  }
+}
+..................................
+/**
+ * This Enum defines the valid states for a Loan including approved and rejected.
+ */
+public enum Statuses {
+  APPROVED, DECLINED, PENDING, REJECTED
+}
+
+............
+
+application.properties
+# This setting controls the switch between modes
+spring.profiles.active=@spring.profile.activated@
+
+# This setting can increase or decrease the rate of message production (1000 = 1s)
+# spring.cloud.stream.poller.fixed-delay=1000
+
+# This setting can control which function method in our code will be triggered if there are multiple
+# spring.cloud.function.definition=supplyLoan
+
+# Give the autogenerated binding a friendlier name
+spring.cloud.stream.function.bindings.supplyLoan-out-0=output
+
+application-kafka.properties
+spring.application.name=loansource-kafka
+
+..........................................................................................
+
+Consumer Consumer
+................
+
+application.properties
+spring.profiles.active=@spring.profile.activated@
+
+
+package io.pivotal.loancheck;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+
+@SpringBootApplication
+@EnableBinding(LoanProcessor.class)
+public class LoanCheckApplication {
+
+  public static final Logger log = LoggerFactory.getLogger(LoanCheckApplication.class);
+
+  public static void main(String[] args) {
+    SpringApplication.run(LoanCheckApplication.class, args);
+    log.info("The Loancheck Application has started...");
+  }
+}
+package io.pivotal.loancheck;
+
+import org.springframework.cloud.stream.annotation.Input;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.SubscribableChannel;
+import org.springframework.stereotype.Component;
+
+@Component
+public interface LoanProcessor {
+
+  String APPLICATIONS_IN = "output";
+  String APPROVED_OUT = "approved";
+  String DECLINED_OUT = "declined";
+
+  @Input(APPLICATIONS_IN)
+  SubscribableChannel sourceOfLoanApplications();
+
+  @Output(APPROVED_OUT)
+  MessageChannel approved();
+
+  @Output(DECLINED_OUT)
+  MessageChannel declined();
+
+}
+
+package io.pivotal.loancheck;
+
+public enum Statuses {
+  APPROVED, DECLINED, PENDING, REJECTED
+}
+
+package io.pivotal.loancheck;
+
+
+import java.util.Objects;
+
+public class Loan {
+
+  private String uuid, name, status;
+  private long amount;
+
+  public Loan() {
+  }
+
+  public Loan(String uuid, String name, long amount) {
+    this.uuid = uuid;
+    this.name = name;
+    this.amount = amount;
+    this.setStatus(Statuses.PENDING.name());
+  }
+
+  public String getUuid() {
+    return uuid;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    if (status.equals(Statuses.APPROVED.name())
+            || status.equals(Statuses.DECLINED.name())
+            || status.equals(Statuses.PENDING.name())
+            || status.equals(Statuses.REJECTED.name())) {
+      this.status = status;
+    } else {
+      throw new IllegalArgumentException("Cannot set the LoanApplication's status to " + status);
+    }
+  }
+
+  public long getAmount() {
+    return amount;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Loan that = (Loan) o;
+    return amount == that.amount &&
+            uuid.equals(that.uuid) &&
+            name.equals(that.name) &&
+            Objects.equals(status, that.status);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(uuid, name, status, amount);
+  }
+
+  @Override
+  public String toString() {
+    return "Loan{" +
+            "uuid='" + uuid + '\'' +
+            ", name='" + name + '\'' +
+            ", status='" + status + '\'' +
+            ", amount=" + amount +
+            '}';
+  }
+}
+package io.pivotal.loancheck;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Component;
+
+@Component
+public class LoanChecker {
+
+  public static final Logger log = LoggerFactory.getLogger(LoanChecker.class);
+  private static final Long MAX_AMOUNT = 10000L;
+  private LoanProcessor processor;
+
+  @Autowired
+  public LoanChecker(LoanProcessor processor) {
+    this.processor = processor;
+  }
+
+  @StreamListener(LoanProcessor.APPLICATIONS_IN)
+  public void checkAndSortLoans(Loan loan) {
+    log.info("{} {} for ${} for {}", loan.getStatus(), loan.getUuid(), loan.getAmount(), loan.getName());
+
+    if (loan.getAmount() > MAX_AMOUNT) {
+      loan.setStatus(Statuses.DECLINED.name());
+      processor.declined().send(message(loan));
+    } else {
+      loan.setStatus(Statuses.APPROVED.name());
+      processor.approved().send(message(loan));
+    }
+
+    log.info("{} {} for ${} for {}", loan.getStatus(), loan.getUuid(), loan.getAmount(), loan.getName());
+
+  }
+
+  private static final <T> Message<T> message(T val) {
+    return MessageBuilder.withPayload(val).build();
+  }
+}
+...................
+
+docker-compose up
+
+..............................................................................................
+                                Distributed Transactions :Saga					
+..............................................................................................
+
+
+How to manage distributed transactions where transaction one service should dependant other services.
+
+BookingService                        PaymentService ------Bankers
+   =>STARTED
+   =>PENDING
+   =>COMPLETED <-------------------->  COMPLETED
+   =>BOOKED
+   =>REJECTED/DECLINED
+
+..............................................................................................
+
+Setup:
+
+1.Transactions coordiniator
+   =>MessageBroker
+   =>Platforms to help coordinate transactions
+   =>Eventuate Tram
+
+..............................................................................................
+				 Management Patterns
+.............................................................................................
+
+Distributed Tracing and Logging:
+................................
+
+Zipkin is very efficient tool for distributed tracing in microservices ecosystem. Distributed tracing, in general, is latency measurement of each component in a distributed transaction where multiple microservices are invoked to serve a single business usecase. Let’s say from our application, we have to call 4 different services/components for a transaction. Here with distributed tracing enabled, we can measure which component took how much time.
+
+Zipkin
+
+Modules
+
+1.Collector – Once any component sends the trace data arrives to Zipkin collector daemon, it is validated, stored, and indexed for lookups by the Zipkin collector.
+
+2.Storage – This module store and index the lookup data in backend. Cassandra, ElasticSearch and MySQL are supported.
+
+3.Search – This module provides a simple JSON API for finding and retrieving traces stored in backend. The primary consumer of this API is the Web UI.
+
+4.Web UI – A very nice UI interface for viewing traces.
+
+.........................................................................................
+
+Adding a Health Check in Spring Boot:
+
+
+Adding the Actuator Dependency
+
+The Actuator module provides useful insight into the Spring environment for a running application with functions for health checking and metrics gathering by exposing multiple endpoints over HTTP and JMX. We can refer to the full description of the Actuator module in the Actuator Documentation.
+
+We added the actuator dependency while creating the application from the Initializr. We can choose to add it later in our pom.xml:
+
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+Checking Health Status Details
+
+management.endpoint.health.show-details=always
+
+
+
+Sample health information
+
+{
+   "status": "UP",
+   "components": {
+    "diskSpace": {
+     "status": "UP",
+     "details": {
+      "total": 250685575168,
+      "free": 12073996288,
+      "threshold": 10485760,
+      "exists": true
+     }
+    },
+    "ping": {
+     "status": "UP"
+    }
+   }
+}
+
+Helath indicator api
+
+-by default acuator can collect only rest api metrics
+if you want to collect databse metrics.... you have to write code for code
+
+Health Indicators
+
+Spring Boot Actuator comes with several predefined health indicators like
+
+    DataSourceHealthIndicator, - SQL based databases
+    MongoHealthIndicator - mongo db health db
+    RedisHealthIndicator, -redis
+    CassandraHealthIndicator -casandra
+
+
+
+Each of them is a Spring bean that implements the HealthIndicator interface and checks the health of that component.
+
+Spring Boot automatically provides a health indicator for standard components (like a DataSource). The health check provided by a DataSource creates a connection to a database and performs a simple query, such as select 1 from dual to check that it is working.
+
+
+if you want to disable some resource health
+
+management.health.mongo.enabled=false
+////////////////////////////////////////////////////////////////////////////////////////////////////////Implementation:
+
+dependancy:
+...........
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+..............................................................................................
+					Deployment Patterns
+...............................................................................................
+
+1.Light weight VM Deployment : Containerized Deployments
+
+Every Service /Every app will have Deployment Descriptor
+
+Docker File 
+FROM openjdk:8-jdk-alpine
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]  
+ 
+Application may have dependencies ;
+ -Database
+ -MessageBroker -RabbitMQ
+
+Docker-Compose 
+  Collection of indivual app configuration
+
+App
+  -Database
+ -MessageBroker -RabbitMQ
+
+Container(vm) Management/Orachrastation Platforms
+
+1.Kubernetes
+ =>Manage large containers on cloud and local machines
+.............................................................................................
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
